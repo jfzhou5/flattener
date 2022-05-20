@@ -6,7 +6,7 @@ truffle-flattener 的精简版
 ## 前提：
 * 项目根目录创建`full/`文件夹
 * clone 本仓库代码之后，执行`yarn link flat`
-* `chmod +x flattener.js`
+* `chmod u+x flattener.js`
 ## 用法：
 ```shell
 $ flat contracts/Box.sol

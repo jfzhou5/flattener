@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-const commander = require('commander');
-const path = require('path');
-const shell = require('shelljs');
-const fs = require('fs');
-const readline = require('readline');
-const cwd = process.cwd()
+const commander = require("commander");
+const path = require("path");
+const shell = require("shelljs");
+const fs = require("fs");
+const readline = require("readline");
+const cwd = process.cwd();
 
 const program = new commander.Command();
-const defaultFlatPath = path.join(cwd, "flat/");
-const licenseStr = "SPDX-License-Identifier: MIT";
+const defaultFlatPath = path.join(cwd, "flatten/");
+const licenseStr = "SPDX-License-Identifier: ";
 
 async function processLineByLine(filePath) {
   const fileStream = fs.createReadStream(filePath);
@@ -18,7 +18,7 @@ async function processLineByLine(filePath) {
 
   const rl = readline.createInterface({
     input: fileStream,
-    crlfDelay: Infinity // 注意：我们使用 crlfDelay 选项将 input.txt 中的所有 CR LF 实例（'\r\n'）识别为单个换行符。
+    crlfDelay: Infinity, // 注意：我们使用 crlfDelay 选项将 input.txt 中的所有 CR LF 实例（'\r\n'）识别为单个换行符。
   });
 
   // remove multiple license str
@@ -34,30 +34,28 @@ async function processLineByLine(filePath) {
   }
 
   // rewrite flat sol file
-  const fwrite = fs.createWriteStream(filePath)
+  const fwrite = fs.createWriteStream(filePath);
   for await (const line of wl) {
     fwrite.write(line);
   }
 }
 
-program
-  .arguments('<filePath> [outputPath]')
-  .action((filePath, outputPath) => {
-    filePath = path.join(cwd, filePath);
-    let fileName = filePath.split('/').slice(-1)[0];
+program.arguments("<filePath> [outputPath]").action((filePath, outputPath) => {
+  filePath = path.join(cwd, filePath);
+  let fileName = filePath.split("/").slice(-1)[0];
 
-    if (!outputPath) {
-      outputPath = path.join(defaultFlatPath, fileName);
-    } else {
-      outputPath = path.join(defaultFlatPath, outputPath);
-    }
+  if (!outputPath) {
+    outputPath = path.join(defaultFlatPath, fileName);
+  } else {
+    outputPath = path.join(defaultFlatPath, outputPath);
+  }
 
-    shell.exec(`truffle-flattener ${filePath} > ${outputPath}`);
+  shell.exec(`npx hardhat flatten ${filePath} > ${outputPath}`);
 
-    processLineByLine(outputPath);
+  processLineByLine(outputPath);
 
-    console.log("output path: ", outputPath);
-  });
+  console.log("output path: ", outputPath);
+});
 
 program.parse(process.argv);
 
