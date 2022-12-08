@@ -10,10 +10,12 @@ const cwd = process.cwd();
 const program = new commander.Command();
 const defaultFlatPath = path.join(cwd, "flatten/");
 const licenseStr = "SPDX-License-Identifier: ";
+const abiEncoderV2 = "pragma abicoder";
 
 async function processLineByLine(filePath) {
   const fileStream = fs.createReadStream(filePath);
   let LicenseExist = false;
+  let abiEncoderV2Exist = false;
   let wl = new Array();
 
   const rl = readline.createInterface({
@@ -26,6 +28,11 @@ async function processLineByLine(filePath) {
     if (line.indexOf(licenseStr) >= 0) {
       if (!LicenseExist) {
         LicenseExist = true;
+        wl.push(line + "\n");
+      }
+    } else if (line.includes(abiEncoderV2)) {
+      if (!abiEncoderV2Exist) {
+        abiEncoderV2Exist = true;
         wl.push(line + "\n");
       }
     } else {
